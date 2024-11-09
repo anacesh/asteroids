@@ -1,4 +1,7 @@
 # pyright: basic
+import pygame
+
+from Assets.assets import Assets
 from circleshape import *
 from constants import *
 from shot import *
@@ -14,7 +17,8 @@ class Player(CircleShape):
         self.fire_rate = 0
         self.score = 0
         self.lives = PLAYER_LIVES
-        self.iframes = 0
+        self.iframes = 0 # какой еще ифрейм?)
+
 
     def triangle(self):
         forward = pygame.Vector2(0, 1).rotate(self.rotation)
@@ -45,10 +49,10 @@ class Player(CircleShape):
         keys = pygame.key.get_pressed()
         self.rotate(dt)
 
-        if keys[pygame.K_w]:
+        if keys[pygame.K_w] or keys[pygame.K_UP]:
             self.move(dt)
 
-        if keys[pygame.K_s]:
+        if keys[pygame.K_s] or keys[pygame.K_DOWN]:
             self.move(dt * -1)
 
         if keys[pygame.K_SPACE]:
@@ -61,14 +65,17 @@ class Player(CircleShape):
             forward = pygame.Vector2(0, 1).rotate(self.rotation)
             shot.velocity = forward
             self.fire_rate = PLAYER_FIRE_COOLDOWN
+            Assets.get_instance().audio.play_shot_sound()
             # all_sounds.get("shot1", None).play()
 
     def die(self):
         if self.iframes <= 0:
             if self.lives == 0:
                 # all_sounds.get("we_lost", None).play()
+                Assets.get_instance().audio.sounds.get("we_lost").play()
                 time.sleep(1)
                 exit("Game Over!")
+            Assets.get_instance().audio.sounds.get("hero_damage").play()
             self.lives -= 1
             # all_sounds.get("hero_damage", None).play()
             self.iframes = PLAYER_IFRAMES
