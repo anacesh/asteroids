@@ -4,14 +4,18 @@ from constants import *
 from player import Player
 from asteroid import *
 from asteroidfield import *
+from assets import *
 from shot import *
 
 
 def main():
     pygame.init()
+    pygame.mixer.init()
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
     clock = pygame.time.Clock()
-    font = pygame.font.Font("inter.ttf", 24)
+    font = pygame.font.Font("./Assets/fonts/inter.ttf", 24)
+    sounds = Assets()
+    sounds.play("shot1")
     dt = 0
     updatable = pygame.sprite.Group()
     drawable = pygame.sprite.Group()
@@ -29,7 +33,9 @@ def main():
                 return
 
         screen.fill("black")
-        text_surface = font.render(f"Score: {player.score}", True, (255, 255, 255))
+        text_surface = font.render(
+            f"Score: {player.score}\nLives: {player.lives}", True, (255, 255, 255)
+        )
         screen.blit(text_surface, (SCREEN_WIDTH - 200, 20))
 
         for obj in drawable:
@@ -44,9 +50,8 @@ def main():
                     ast.split(player)
                     shot.kill()
 
-
             if ast.is_colliding(player):
-                exit("Game over!")
+                player.die()
 
         pygame.display.flip()
         dt = clock.tick(60) / 1000

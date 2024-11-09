@@ -3,6 +3,7 @@ from circleshape import *
 from constants import *
 from shot import *
 import shot
+import time
 
 
 class Player(CircleShape):
@@ -12,6 +13,8 @@ class Player(CircleShape):
         self.rotation = 0
         self.fire_rate = 0
         self.score = 0
+        self.lives = PLAYER_LIVES
+        self.iframes = 0
 
     def triangle(self):
         forward = pygame.Vector2(0, 1).rotate(self.rotation)
@@ -38,6 +41,7 @@ class Player(CircleShape):
 
     def update(self, dt):
         self.fire_rate -= 1 * dt
+        self.iframes -= 1
         keys = pygame.key.get_pressed()
         self.rotate(dt)
 
@@ -57,3 +61,17 @@ class Player(CircleShape):
             forward = pygame.Vector2(0, 1).rotate(self.rotation)
             shot.velocity = forward
             self.fire_rate = PLAYER_FIRE_COOLDOWN
+            # all_sounds.get("shot1", None).play()
+
+    def die(self):
+        if self.iframes <= 0:
+            if self.lives == 0:
+                # all_sounds.get("we_lost", None).play()
+                time.sleep(1)
+                exit("Game Over!")
+            self.lives -= 1
+            # all_sounds.get("hero_damage", None).play()
+            self.iframes = PLAYER_IFRAMES
+            self.position = pygame.Vector2(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
+
+
